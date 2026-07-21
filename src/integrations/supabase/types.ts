@@ -14,16 +14,177 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      evaluations: {
+        Row: {
+          comp_equipe: number | null
+          comp_lideranca: number | null
+          comp_proatividade: number | null
+          created_at: string
+          created_by: string | null
+          eval_date: string
+          id: string
+          notes: string | null
+          os_number: string | null
+          prod_agilidade: number | null
+          prod_cumprimento_prazo: number | null
+          prod_diagnostico: number | null
+          prod_resolucao: number | null
+          qual_checklist: number | null
+          qual_inspecoes: number | null
+          qual_qualidade_servico: number | null
+          qual_retrabalho: number | null
+          seg_epi: number | null
+          seg_organizacao: number | null
+          seg_zelo: number | null
+          service_type: string | null
+          technician_id: string
+          updated_at: string
+        }
+        Insert: {
+          comp_equipe?: number | null
+          comp_lideranca?: number | null
+          comp_proatividade?: number | null
+          created_at?: string
+          created_by?: string | null
+          eval_date?: string
+          id?: string
+          notes?: string | null
+          os_number?: string | null
+          prod_agilidade?: number | null
+          prod_cumprimento_prazo?: number | null
+          prod_diagnostico?: number | null
+          prod_resolucao?: number | null
+          qual_checklist?: number | null
+          qual_inspecoes?: number | null
+          qual_qualidade_servico?: number | null
+          qual_retrabalho?: number | null
+          seg_epi?: number | null
+          seg_organizacao?: number | null
+          seg_zelo?: number | null
+          service_type?: string | null
+          technician_id: string
+          updated_at?: string
+        }
+        Update: {
+          comp_equipe?: number | null
+          comp_lideranca?: number | null
+          comp_proatividade?: number | null
+          created_at?: string
+          created_by?: string | null
+          eval_date?: string
+          id?: string
+          notes?: string | null
+          os_number?: string | null
+          prod_agilidade?: number | null
+          prod_cumprimento_prazo?: number | null
+          prod_diagnostico?: number | null
+          prod_resolucao?: number | null
+          qual_checklist?: number | null
+          qual_inspecoes?: number | null
+          qual_qualidade_servico?: number | null
+          qual_retrabalho?: number | null
+          seg_epi?: number | null
+          seg_organizacao?: number | null
+          seg_zelo?: number | null
+          service_type?: string | null
+          technician_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluations_technician_id_fkey"
+            columns: ["technician_id"]
+            isOneToOne: false
+            referencedRelation: "technicians"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          status: Database["public"]["Enums"]["approval_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id: string
+          status?: Database["public"]["Enums"]["approval_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          status?: Database["public"]["Enums"]["approval_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      technicians: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "tecnico"
+      approval_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +311,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "tecnico"],
+      approval_status: ["pending", "approved", "rejected"],
+    },
   },
 } as const
