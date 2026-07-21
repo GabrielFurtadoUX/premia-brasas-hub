@@ -4,6 +4,12 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Premia Brasas — tipografia Brasas */
+@theme {
+  --font-sans: "Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Poppins", ui-sans-serif, system-ui, sans-serif;
+}
+
 /*
  * Design system definition.
  *
@@ -62,26 +68,31 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
+  --radius: 0.5rem;
+  /* Brasas palette: white background, deep charcoal text, fire red primary */
+  --background: oklch(0.995 0 0);
+  --foreground: oklch(0.2 0.02 20);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
+  --card-foreground: oklch(0.2 0.02 20);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
+  --popover-foreground: oklch(0.2 0.02 20);
+  /* Fire red — Brasas signature */
+  --primary: oklch(0.6 0.22 25);
+  --primary-foreground: oklch(1 0 0);
+  --primary-glow: oklch(0.68 0.24 28);
+  --secondary: oklch(0.97 0.005 20);
+  --secondary-foreground: oklch(0.2 0.02 20);
+  --muted: oklch(0.96 0.005 20);
+  --muted-foreground: oklch(0.5 0.02 20);
+  --accent: oklch(0.95 0.03 25);
+  --accent-foreground: oklch(0.35 0.15 25);
+  --destructive: oklch(0.55 0.24 27);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.9 0.01 20);
+  --input: oklch(0.92 0.008 20);
+  --ring: oklch(0.6 0.22 25);
+  --gradient-brasas: linear-gradient(135deg, oklch(0.6 0.22 25), oklch(0.68 0.24 28));
+  --shadow-brasas: 0 12px 40px -12px oklch(0.6 0.22 25 / 0.35);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
