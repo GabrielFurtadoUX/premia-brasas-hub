@@ -119,6 +119,7 @@ function Dashboard() {
       </header>
 
       <main className="mx-auto max-w-7xl px-6 py-8">
+        {isAdmin && <PendingBanner onOpenTab={() => setTab("aprovar")} />}
         {tab === "painel" && <PainelTab />}
         {tab === "avaliar" && isAdmin && <AvaliarTab />}
         {tab === "tecnicos" && isAdmin && <TecnicosTab />}
@@ -156,6 +157,73 @@ function PendingScreen({ name, onSignOut, status }: { name: string; onSignOut: (
 }
 
 // ---------- Painel ----------
+
+function PendingBanner({ onOpenTab }: { onOpenTab: () => void }) {
+  const qc = useQueryClient();
+  const listFn = useServerFn(listProfiles);
+  const setStatusFn = useServerFn(setProfileStatus);
+  const profiles = useQuery({ queryKey: ["profiles"], queryFn: () => listFn() });
+  const mut = useMutation({
+    mutationFn: (v: { id: string; status: "approved" | "rejected" }) =>
+      setStatusFn({ data: v }),
+    onSuccess: (_d, v) => {
+      toast.success(v.status === "approved" ? "Cadastro aprovado!" : "Cadastro recusado.");
+      qc.invalidateQueries({ queryKey: ["profiles"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Erro"),
+  });
+
+  const pending = (profiles.data ?? []).filter((p: any) => p.status === "pending");
+  if (pending.length === 0) return null;
+
+  return (
+    <div className="mb-6 space-y-2">
+      {pending.map((p: any) => (
+        <div
+          key={p.id}
+          className="flex flex-col gap-3 rounded-xl border-2 border-primary/30 bg-primary/5 p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
+              <Clock className="h-5 w-5" />
+            </div>
+            <div className="leading-tight">
+              <div className="text-xs font-bold uppercase tracking-wider text-primary">
+                Solicitação de cadastro
+              </div>
+              <div className="text-sm font-bold">{p.full_name}</div>
+              <div className="text-xs text-muted-foreground">{p.email}</div>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => mut.mutate({ id: p.id, status: "approved" })}
+              disabled={mut.isPending}
+              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-bold text-primary-foreground shadow-[var(--shadow-brasas)] transition hover:brightness-110 disabled:opacity-60"
+            >
+              <CheckCircle2 className="h-4 w-4" /> Aprovar
+            </button>
+            <button
+              onClick={() => mut.mutate({ id: p.id, status: "rejected" })}
+              disabled={mut.isPending}
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-4 py-2 text-sm font-bold hover:bg-secondary disabled:opacity-60"
+            >
+              <XCircle className="h-4 w-4" /> Não aprovar
+            </button>
+          </div>
+        </div>
+      ))}
+      {pending.length > 2 && (
+        <button
+          onClick={onOpenTab}
+          className="text-xs font-semibold text-primary hover:underline"
+        >
+          Ver todas as solicitações →
+        </button>
+      )}
+    </div>
+  );
+}
 
 const num = (v: unknown) => (v == null || v === "" ? null : Number(v));
 const avg = (arr: (number | null)[]) => {
