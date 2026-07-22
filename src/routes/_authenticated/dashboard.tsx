@@ -119,6 +119,7 @@ function Dashboard() {
       </header>
 
       <main className="mx-auto max-w-7xl px-6 py-8">
+        {isAdmin && <PendingBanner onOpenTab={() => setTab("aprovar")} />}
         {tab === "painel" && <PainelTab />}
         {tab === "avaliar" && isAdmin && <AvaliarTab />}
         {tab === "tecnicos" && isAdmin && <TecnicosTab />}
