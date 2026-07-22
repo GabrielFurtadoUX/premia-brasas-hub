@@ -32,7 +32,14 @@ function Dashboard() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const meFn = useServerFn(getMe);
-  const me = useQuery({ queryKey: ["me"], queryFn: () => meFn() });
+  const me = useQuery({
+    queryKey: ["me"],
+    queryFn: () => meFn(),
+    // Enquanto o cadastro estiver pendente, verifica novamente a cada 5s
+    // para que a tela "Aguardando aprovação" saia sozinha assim que o admin aprovar.
+    refetchInterval: (q) => (q.state.data?.isApproved ? false : 5000),
+    refetchOnWindowFocus: true,
+  });
 
   const [tab, setTab] = useState<Tab>("painel");
 
