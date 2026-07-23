@@ -9,27 +9,26 @@ export const getMe = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const claimEmail =
       typeof context.claims.email === "string" ? context.claims.email.toLowerCase() : "";
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const metadata =
+      typeof context.claims.user_metadata === "object" && context.claims.user_metadata !== null
+        ? context.claims.user_metadata
+        : null;
+    const fullName =
+      metadata && "full_name" in metadata && typeof metadata.full_name === "string"
+        ? metadata.full_name
+        : claimEmail.split("@")[0] || "Usuário Premia Brasas";
+    const isMaster = claimEmail === "gabrielfurtados@hotmail.com";
 
-    if (claimEmail === "gabrielfurtados@hotmail.com") {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const fullName =
-        typeof context.claims.user_metadata === "object" &&
-        context.claims.user_metadata !== null &&
-        "full_name" in context.claims.user_metadata &&
-        typeof context.claims.user_metadata.full_name === "string"
-          ? context.claims.user_metadata.full_name
-          : "Gabriel Furtado dos Santos";
-
-      await supabaseAdmin.from("profiles").upsert({
-        id: userId,
-        full_name: fullName,
-        email: claimEmail,
-        status: "approved",
-      });
-      await supabaseAdmin
-        .from("user_roles")
-        .upsert({ user_id: userId, role: "admin" }, { onConflict: "user_id,role" });
-    }
+    await supabaseAdmin.from("profiles").upsert({
+      id: userId,
+      full_name: fullName,
+      email: claimEmail,
+      status: "approved",
+    });
+    await supabaseAdmin
+      .from("user_roles")
+      .upsert({ user_id: userId, role: isMaster ? "admin" : "tecnico" }, { onConflict: "user_id,role" });
 
     const [{ data: profile, error: profileError }, { data: roles, error: rolesError }] = await Promise.all([
       supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
