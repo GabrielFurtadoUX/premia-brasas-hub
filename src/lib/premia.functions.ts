@@ -43,38 +43,6 @@ export const getMe = createServerFn({ method: "GET" })
     };
   });
 
-// Admin: list all profiles
-export const listProfiles = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { data, error } = await context.supabase
-      .from("profiles")
-      .select("*")
-      .order("created_at", { ascending: false });
-    if (error) throw new Error(error.message);
-    return data ?? [];
-  });
-
-// Admin: update profile status
-export const setProfileStatus = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((d) =>
-    z
-      .object({
-        id: z.string().uuid(),
-        status: z.enum(["pending", "approved", "rejected"]),
-      })
-      .parse(d),
-  )
-  .handler(async ({ context, data }) => {
-    const { error } = await context.supabase
-      .from("profiles")
-      .update({ status: data.status })
-      .eq("id", data.id);
-    if (error) throw new Error(error.message);
-    return { ok: true };
-  });
-
 // Technicians
 export const listTechnicians = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -98,29 +66,6 @@ export const addTechnician = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-// Evaluations
-const evalSchema = z.object({
-  technician_id: z.string().uuid(),
-  eval_date: z.string(),
-  os_number: z.string().optional().nullable(),
-  service_type: z.string().optional().nullable(),
-  notes: z.string().optional().nullable(),
-  prod_cumprimento_prazo: z.number().min(0).max(10).nullable(),
-  prod_agilidade: z.number().min(0).max(10).nullable(),
-  prod_diagnostico: z.number().min(0).max(10).nullable(),
-  prod_resolucao: z.number().min(0).max(10).nullable(),
-  qual_retrabalho: z.number().min(0).max(10).nullable(),
-  qual_checklist: z.number().min(0).max(10).nullable(),
-  qual_inspecoes: z.number().min(0).max(10).nullable(),
-  qual_qualidade_servico: z.number().min(0).max(10).nullable(),
-  seg_epi: z.number().min(0).max(10).nullable(),
-  seg_zelo: z.number().min(0).max(10).nullable(),
-  seg_organizacao: z.number().min(0).max(10).nullable(),
-  comp_lideranca: z.number().min(0).max(10).nullable(),
-  comp_equipe: z.number().min(0).max(10).nullable(),
-  comp_proatividade: z.number().min(0).max(10).nullable(),
-});
-
 export const listEvaluations = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -135,7 +80,31 @@ export const listEvaluations = createServerFn({ method: "GET" })
 
 export const createEvaluation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => evalSchema.parse(d))
+  .inputValidator((d) =>
+    z
+      .object({
+        technician_id: z.string().uuid(),
+        eval_date: z.string(),
+        os_number: z.string().optional().nullable(),
+        service_type: z.string().optional().nullable(),
+        notes: z.string().optional().nullable(),
+        prod_cumprimento_prazo: z.number().min(0).max(10).nullable(),
+        prod_agilidade: z.number().min(0).max(10).nullable(),
+        prod_diagnostico: z.number().min(0).max(10).nullable(),
+        prod_resolucao: z.number().min(0).max(10).nullable(),
+        qual_retrabalho: z.number().min(0).max(10).nullable(),
+        qual_checklist: z.number().min(0).max(10).nullable(),
+        qual_inspecoes: z.number().min(0).max(10).nullable(),
+        qual_qualidade_servico: z.number().min(0).max(10).nullable(),
+        seg_epi: z.number().min(0).max(10).nullable(),
+        seg_zelo: z.number().min(0).max(10).nullable(),
+        seg_organizacao: z.number().min(0).max(10).nullable(),
+        comp_lideranca: z.number().min(0).max(10).nullable(),
+        comp_equipe: z.number().min(0).max(10).nullable(),
+        comp_proatividade: z.number().min(0).max(10).nullable(),
+      })
+      .parse(d),
+  )
   .handler(async ({ context, data }) => {
     const { error } = await context.supabase
       .from("evaluations")
