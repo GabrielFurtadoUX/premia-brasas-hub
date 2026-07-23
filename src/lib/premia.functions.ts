@@ -7,10 +7,36 @@ export const getMe = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const [{ data: profile }, { data: roles }] = await Promise.all([
+    const claimEmail =
+      typeof context.claims.email === "string" ? context.claims.email.toLowerCase() : "";
+
+    if (claimEmail === "gabrielfurtados@hotmail.com") {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const fullName =
+        typeof context.claims.user_metadata === "object" &&
+        context.claims.user_metadata !== null &&
+        "full_name" in context.claims.user_metadata &&
+        typeof context.claims.user_metadata.full_name === "string"
+          ? context.claims.user_metadata.full_name
+          : "Gabriel Furtado dos Santos";
+
+      await supabaseAdmin.from("profiles").upsert({
+        id: userId,
+        full_name: fullName,
+        email: claimEmail,
+        status: "approved",
+      });
+      await supabaseAdmin
+        .from("user_roles")
+        .upsert({ user_id: userId, role: "admin" }, { onConflict: "user_id,role" });
+    }
+
+    const [{ data: profile, error: profileError }, { data: roles, error: rolesError }] = await Promise.all([
       supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
       supabase.from("user_roles").select("role").eq("user_id", userId),
     ]);
+    if (profileError) throw new Error(profileError.message);
+    if (rolesError) throw new Error(rolesError.message);
     return {
       profile,
       isAdmin: (roles ?? []).some((r) => r.role === "admin"),
