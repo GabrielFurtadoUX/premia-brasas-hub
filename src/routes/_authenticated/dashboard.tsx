@@ -58,6 +58,10 @@ function Dashboard() {
     );
   }
 
+  if (me.isError) {
+    return <AccessErrorScreen onSignOut={signOut} />;
+  }
+
   if (!me.data?.isApproved) {
     return <PendingScreen name={me.data?.profile?.full_name ?? ""} onSignOut={signOut} status={me.data?.profile?.status ?? "pending"} />;
   }
@@ -132,6 +136,28 @@ function Dashboard() {
         {tab === "tecnicos" && isAdmin && <TecnicosTab />}
         {tab === "aprovar" && isAdmin && <AprovacoesTab />}
       </main>
+    </div>
+  );
+}
+
+function AccessErrorScreen({ onSignOut }: { onSignOut: () => void }) {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-secondary/40 px-4">
+      <div className="w-full max-w-md rounded-xl border border-border bg-card p-8 text-center shadow-lg">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+          <XCircle className="h-8 w-8" />
+        </div>
+        <h1 className="mt-5 text-2xl font-black">Sessão desatualizada</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Saia e entre novamente para carregar seu acesso aprovado no Premia Brasas.
+        </p>
+        <button
+          onClick={onSignOut}
+          className="mt-6 inline-flex items-center gap-1.5 rounded-md border border-border px-4 py-2 text-sm font-semibold hover:bg-secondary"
+        >
+          <LogOut className="h-4 w-4" /> Sair
+        </button>
+      </div>
     </div>
   );
 }
