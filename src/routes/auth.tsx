@@ -48,8 +48,7 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Cadastro enviado! Aguarde a aprovação do operador master.");
-        // Sign them in so we can show the pending screen
+        toast.success("Cadastro criado! Acesso liberado.");
         await supabase.auth.signInWithPassword({ email: email.trim(), password });
         navigate({ to: "/dashboard" });
       } else {
@@ -138,7 +137,7 @@ function AuthPage() {
           <p className="mt-1 text-sm text-muted-foreground">
             {mode === "login"
               ? "Use seu e-mail e senha de acesso."
-              : "Preencha seus dados. O operador master irá aprovar seu acesso."}
+              : "Preencha seus dados para acessar o sistema."}
           </p>
 
           <form onSubmit={onSubmit} className="mt-6 space-y-4">
@@ -188,7 +187,7 @@ function AuthPage() {
               className="flex w-full items-center justify-center gap-2 rounded-md bg-primary py-3 text-sm font-bold text-primary-foreground shadow-[var(--shadow-brasas)] transition hover:brightness-110 disabled:opacity-60"
             >
               {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-              {mode === "login" ? "Entrar" : "Enviar cadastro"}
+              {mode === "login" ? "Entrar" : "Criar cadastro"}
             </button>
           </form>
 

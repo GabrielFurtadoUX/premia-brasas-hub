@@ -38,9 +38,9 @@ export const getMe = createServerFn({ method: "GET" })
     if (profileError) throw new Error(profileError.message);
     if (rolesError) throw new Error(rolesError.message);
     return {
-      profile,
+      profile: profile ? { ...profile, status: "approved" as const } : profile,
       isAdmin: (roles ?? []).some((r) => r.role === "admin"),
-      isApproved: profile?.status === "approved",
+      isApproved: true,
     };
   });
 
