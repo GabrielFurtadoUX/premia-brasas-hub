@@ -11,7 +11,7 @@ import {
   createEvaluation,
   deleteEvaluation,
 } from "@/lib/premia.functions";
-import { Flame, LogOut, XCircle, Trash2, Plus, Loader2, Trophy } from "lucide-react";
+import { Flame, LogOut, Trash2, Plus, Loader2, Trophy } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -34,6 +34,7 @@ function Dashboard() {
     queryKey: ["me"],
     queryFn: () => meFn(),
     refetchOnWindowFocus: true,
+    retry: 3,
   });
 
   const [tab, setTab] = useState<Tab>("painel");
@@ -54,7 +55,29 @@ function Dashboard() {
   }
 
   if (me.isError) {
-    return <AccessErrorScreen onSignOut={signOut} />;
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-secondary/40 px-4">
+        <div className="w-full max-w-md rounded-xl border border-border bg-card p-8 text-center shadow-lg">
+          <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
+          <h1 className="mt-5 text-2xl font-black">Carregando seu acesso</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Estamos atualizando seu painel com a sessão atual.
+          </p>
+          <button
+            onClick={() => me.refetch()}
+            className="mt-6 inline-flex items-center gap-1.5 rounded-md border border-border px-4 py-2 text-sm font-semibold hover:bg-secondary"
+          >
+            Tentar novamente
+          </button>
+          <button
+            onClick={signOut}
+            className="ml-2 mt-6 inline-flex items-center gap-1.5 rounded-md border border-border px-4 py-2 text-sm font-semibold hover:bg-secondary"
+          >
+            <LogOut className="h-4 w-4" /> Sair
+          </button>
+        </div>
+      </div>
+    );
   }
 
   const isAdmin = !!me.data?.isAdmin;
@@ -124,28 +147,6 @@ function Dashboard() {
         {tab === "avaliar" && isAdmin && <AvaliarTab />}
         {tab === "tecnicos" && isAdmin && <TecnicosTab />}
       </main>
-    </div>
-  );
-}
-
-function AccessErrorScreen({ onSignOut }: { onSignOut: () => void }) {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-secondary/40 px-4">
-      <div className="w-full max-w-md rounded-xl border border-border bg-card p-8 text-center shadow-lg">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10 text-destructive">
-          <XCircle className="h-8 w-8" />
-        </div>
-        <h1 className="mt-5 text-2xl font-black">Sessão desatualizada</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Saia e entre novamente para carregar seu acesso aprovado no Premia Brasas.
-        </p>
-        <button
-          onClick={onSignOut}
-          className="mt-6 inline-flex items-center gap-1.5 rounded-md border border-border px-4 py-2 text-sm font-semibold hover:bg-secondary"
-        >
-          <LogOut className="h-4 w-4" /> Sair
-        </button>
-      </div>
     </div>
   );
 }
