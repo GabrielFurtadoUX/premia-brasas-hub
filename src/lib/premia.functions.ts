@@ -9,7 +9,6 @@ export const getMe = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const claimEmail =
       typeof context.claims.email === "string" ? context.claims.email.toLowerCase() : "";
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const metadata =
       typeof context.claims.user_metadata === "object" && context.claims.user_metadata !== null
         ? context.claims.user_metadata
@@ -20,25 +19,19 @@ export const getMe = createServerFn({ method: "GET" })
         : claimEmail.split("@")[0] || "Usuário Premia Brasas";
     const isMaster = claimEmail === "gabrielfurtados@hotmail.com";
 
-    await supabaseAdmin.from("profiles").upsert({
-      id: userId,
-      full_name: fullName,
-      email: claimEmail,
-      status: "approved",
-    });
-    await supabaseAdmin
-      .from("user_roles")
-      .upsert({ user_id: userId, role: isMaster ? "admin" : "tecnico" }, { onConflict: "user_id,role" });
-
-    const [{ data: profile, error: profileError }, { data: roles, error: rolesError }] = await Promise.all([
+    const [{ data: profile }, { data: roles }] = await Promise.all([
       supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
       supabase.from("user_roles").select("role").eq("user_id", userId),
     ]);
-    if (profileError) throw new Error(profileError.message);
-    if (rolesError) throw new Error(rolesError.message);
+
     return {
-      profile: profile ? { ...profile, status: "approved" as const } : profile,
-      isAdmin: (roles ?? []).some((r) => r.role === "admin"),
+      profile: profile ?? {
+        id: userId,
+        full_name: fullName,
+        email: claimEmail,
+        status: "approved" as const,
+      },
+      isAdmin: isMaster || (roles ?? []).some((r) => r.role === "admin"),
       isApproved: true,
     };
   });
